@@ -257,3 +257,31 @@ The library is configured as a Svelte package:
 4. **No GitHub API integration** — the Demo section uses hardcoded sample data.
 5. **No CLI tooling** — the README mentions `npx pforge generate-summaries`, which does not exist yet.
 6. **Tests are only examples** — the `vitest-examples/` folder is scaffolding; real tests should be added alongside features.
+
+---
+
+## CLI Tools
+
+### `pforge-init`
+
+Binary installed via the `bin` field in `package.json`. Run with:
+
+```bash
+bunx pforge-init
+```
+
+**What it does:**
+
+1. Prompts for GitHub owner, repository name, and app name
+2. Starts a temporary local HTTP server
+3. Opens the browser on an auto-submitting form to `github.com/settings/apps/new`
+4. Receives the GitHub callback with a temporary code
+5. Exchanges the code for app credentials (`id`, `pem`, `webhook_secret`)
+6. Writes a `.env` file with `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, and `GITHUB_WEBHOOK_SECRET`
+7. Prints the installation URL
+
+**Source files:**
+
+- `src/lib/bin/pforge-init.ts` — CLI entry point (shebang `#!/usr/bin/env node`)
+- `src/lib/server/github-app-manifest.ts` — pure logic (manifest builder + code exchange)
+- `src/lib/server/github-app-manifest.spec.ts` — unit tests

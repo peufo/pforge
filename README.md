@@ -70,33 +70,42 @@ bun add pforge
 ### Prérequis
 
 - Un compte GitHub
-- Une [GitHub App](https://docs.github.com/en/apps/creating-github-apps) configurée avec les permissions sur Issues et Discussions
 - Une clé API pour un LLM (OpenAI, Anthropic, etc.)
 
 ---
 
 ## Utilisation rapide
 
-### 1. Configuration
+### 1. Créer la GitHub App
 
-Crée un fichier de configuration (ex: `pforge.config.js`) :
+Lance le script d'initialisation — il crée automatiquement la GitHub App avec les bonnes permissions et écrit les credentials dans un fichier `.env` :
 
-```js
-export default {
-	github: {
-		owner: 'ton-org',
-		repo: 'ton-projet',
-		appId: process.env.GITHUB_APP_ID,
-		privateKey: process.env.GITHUB_PRIVATE_KEY
-	},
-	llm: {
-		provider: 'openai',
-		apiKey: process.env.OPENAI_API_KEY,
-		model: 'gpt-4o'
-	},
-	// Où stocker les synthèses générées
-	summariesPath: './data/summaries.json'
-};
+```bash
+bunx pforge-init
+```
+
+Le script te demandera :
+
+- le _owner_ / organisation GitHub
+- le nom du _repository_
+- le nom de l'app (optionnel, défaut: `pforge-{repo}`)
+
+Une fois terminé, n'oublie pas d'**installer l'app sur ton repository** via le lien affiché dans le terminal.
+
+### 2. Variables d'environnement
+
+Le fichier `.env` généré contient :
+
+```bash
+GITHUB_APP_ID=123456
+GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n..."
+GITHUB_WEBHOOK_SECRET="..."
+```
+
+Tu peux aussi ajouter ta clé API LLM :
+
+```bash
+OPENAI_API_KEY=sk-...
 ```
 
 ### 2. Intégration dans une page SvelteKit
