@@ -30,29 +30,33 @@ flowchart TD
     User["👤 Utilisateur final"] --> UI["🎨 Composants UI\n(Svelte 5)"]
     UI --> Page["📋 Page Roadmap\nTimeline / Kanban"]
     UI --> API["⚙️ Fonctions API\n(SvelteKit)"]
-    
+
     API --> GH_API["🐙 GitHub API\n(données brutes)"]
     API --> Files["📁 Fichiers\nJSON / Markdown\n(synthèses LLM)"]
     API --> GH_APP["🔑 GitHub App\n(upvotes, commentaires)"]
-    
+
     GH_API --> LLM["🧠 LLM\n(OpenAI, Anthropic...)"]
     LLM --> Files
 ```
 
 ### Frontend
+
 - Composants Svelte 5 réutilisables : timeline, kanban, cartes de fonctionnalités, filtres
 - Affichage switchable entre **Timeline verticale** et **Kanban par statut**
 
 ### Serveur
+
 - Fonctions pour récupérer et formatter les données GitHub
 - Génération de synthèses LLM via API
 
 ### Persistance
+
 - **Données brutes GitHub** → fetch à la volée (toujours à jour)
 - **Synthèses LLM** → fichiers JSON/Markdown versionnés dans le repo
 - **Interactions utilisateurs** (upvotes, commentaires) → via GitHub App (pas de DB externe)
 
 ### Mise à jour des synthèses
+
 Un script CLI / cron-job configurable permet de regénérer les synthèses sur une période donnée sans écraser les corrections manuelles que tu aurais pu faire.
 
 ---
@@ -60,7 +64,7 @@ Un script CLI / cron-job configurable permet de regénérer les synthèses sur u
 ## Installation
 
 ```bash
-npm install pforge
+bun add pforge
 ```
 
 ### Prérequis
@@ -79,19 +83,19 @@ Crée un fichier de configuration (ex: `pforge.config.js`) :
 
 ```js
 export default {
-  github: {
-    owner: 'ton-org',
-    repo: 'ton-projet',
-    appId: process.env.GITHUB_APP_ID,
-    privateKey: process.env.GITHUB_PRIVATE_KEY
-  },
-  llm: {
-    provider: 'openai',
-    apiKey: process.env.OPENAI_API_KEY,
-    model: 'gpt-4o'
-  },
-  // Où stocker les synthèses générées
-  summariesPath: './data/summaries.json'
+	github: {
+		owner: 'ton-org',
+		repo: 'ton-projet',
+		appId: process.env.GITHUB_APP_ID,
+		privateKey: process.env.GITHUB_PRIVATE_KEY
+	},
+	llm: {
+		provider: 'openai',
+		apiKey: process.env.OPENAI_API_KEY,
+		model: 'gpt-4o'
+	},
+	// Où stocker les synthèses générées
+	summariesPath: './data/summaries.json'
 };
 ```
 
@@ -100,13 +104,13 @@ export default {
 ```svelte
 <!-- src/routes/roadmap/+page.svelte -->
 <script>
-  import { Roadmap, RoadmapKanban, RoadmapTimeline } from 'pforge';
+	import { Roadmap, RoadmapKanban, RoadmapTimeline } from 'pforge';
 </script>
 
 <Roadmap config={{ view: 'timeline' }}>
-  <RoadmapTimeline />
-  <!-- ou -->
-  <RoadmapKanban />
+	<RoadmapTimeline />
+	<!-- ou -->
+	<RoadmapKanban />
 </Roadmap>
 ```
 
@@ -136,11 +140,11 @@ Tu peux éditer directement les fichiers JSON/Markdown générés. La prochaine 
 
 ```svelte
 <RoadmapKanban
-  columns={[
-    { status: 'planned', label: 'À venir' },
-    { status: 'in-progress', label: 'En cours' },
-    { status: 'shipped', label: 'Livré' }
-  ]}
+	columns={[
+		{ status: 'planned', label: 'À venir' },
+		{ status: 'in-progress', label: 'En cours' },
+		{ status: 'shipped', label: 'Livré' }
+	]}
 />
 ```
 
@@ -150,13 +154,13 @@ Tu peux éditer directement les fichiers JSON/Markdown générés. La prochaine 
 
 ```bash
 # Lancer le dev server
-npm run dev
+bun run dev
 
 # Build
-npm run build
+bun run build
 
 # Tests
-npm run test
+bun run test
 ```
 
 ---

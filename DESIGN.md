@@ -1,8 +1,10 @@
 <!-- SEED: re-run /impeccable document once there's code to capture the actual tokens and components. -->
 
 ---
+
 name: pforge
 description: Landing page for a GitHub-powered public roadmap library — warm, technical, indie.
+
 ---
 
 # Design System: pforge
@@ -16,6 +18,7 @@ A landing page that feels like peering into a busy, friendly workshop — not a 
 The system rejects generic template aesthetics. Every element should feel intentional, hand-placed, and slightly imperfect in the way that signals human craft. Density is moderate: enough breathing room to feel approachable, enough structure to feel trustworthy.
 
 **Key Characteristics:**
+
 - One bold color carries the visual identity (Committed strategy)
 - Single geometric sans-serif family throughout
 - Flat surfaces at rest; subtle motion on interaction only
@@ -29,9 +32,11 @@ The system rejects generic template aesthetics. Every element should feel intent
 Hue family: deep warm orange-terracotta, anchoring toward the Gumroad/Product Hunt indie spectrum.
 
 ### Primary
+
 - **[Deep Terracotta]** ([to be resolved during implementation]): The signature color. Used for CTAs, key highlights, interactive accents, and the hero's dominant visual motif.
 
 ### Neutral
+
 - **[Warm Paper]** ([to be resolved during implementation]): Background. Slightly warm off-white, never pure `#fff`.
 - **[Charcoal Ink]** ([to be resolved during implementation]): Primary text. Deep warm gray, never pure `#000`.
 - **[Soft Clay]** ([to be resolved during implementation]): Secondary surfaces, borders, dividers. Light warm gray with subtle hue shift toward the primary.
@@ -43,6 +48,7 @@ Hue family: deep warm orange-terracotta, anchoring toward the Gumroad/Product Hu
 **Character:** Clean, confident, and slightly technical without being sterile. The same family carries both display and body, creating a unified voice. Weight contrast between display (bold) and body (regular/medium) provides hierarchy without introducing a second font.
 
 ### Hierarchy
+
 - **Display** (700, [to be resolved during implementation], 1.1): Hero headlines. Short, punchy, commanding.
 - **Headline** (600, [to be resolved during implementation], 1.2): Section titles.
 - **Title** (500, [to be resolved during implementation], 1.3): Subsection headings, card titles.
@@ -57,11 +63,12 @@ Flat by default. Depth is conveyed through tonal layering (background shifts) ra
 
 ## 5. Components
 
-*(Omitted in seed mode — no components exist yet. Re-run `/impeccable document` in scan mode once the first components are built.)*
+_(Omitted in seed mode — no components exist yet. Re-run `/impeccable document` in scan mode once the first components are built.)_
 
 ## 6. Do's and Don'ts
 
 ### Do:
+
 - **Do** let the primary color own the hero and main CTA.
 - **Do** keep surfaces flat at rest; add subtle shadows only on hover/focus.
 - **Do** use weight contrast (700 display vs 400 body) for hierarchy within the single font family.
@@ -69,6 +76,7 @@ Flat by default. Depth is conveyed through tonal layering (background shifts) ra
 - **Do** favor inline progressive disclosure over modals.
 
 ### Don't:
+
 - **Don't** use a card grid of identical icon + heading + text blocks.
 - **Don't** use gradient text, side-stripe borders, or glassmorphism.
 - **Don't** use the hero-metric template (big number, small label, gradient accent).
