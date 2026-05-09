@@ -1,67 +1,45 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type { PForgeStatus, PForgeSummary } from '$lib/types.js';
-	import { PFORGE_BASE } from '$lib/constant.js';
+	import { onMount } from 'svelte'
+	import type { PForgeStatus, PForgeSummary } from '$lib/types'
+	import { PFORGE_BASE } from '$lib/constant'
 
-	let status = $state<PForgeStatus | null>(null);
-	let loading = $state(true);
-	let error = $state('');
-	let repo = $state('');
-	let appName = $state('');
-	let initLoading = $state(false);
-	let summaries = $state<PForgeSummary[]>([]);
-	let summariesLoading = $state(false);
-	let editingId = $state<string | null>(null);
-	let editTitle = $state('');
-	let editBody = $state('');
-	let newPeriodStart = $state('');
-	let newPeriodEnd = $state('');
-	let newTitle = $state('');
-	let newBody = $state('');
-	let generateLoading = $state(false);
+	let status = $state<PForgeStatus | null>(null)
+	let loading = $state(true)
+	let error = $state('')
+	let summaries = $state<PForgeSummary[]>([])
+	let summariesLoading = $state(false)
+	let editingId = $state<string | null>(null)
+	let editTitle = $state('')
+	let editBody = $state('')
+	let newPeriodStart = $state('')
+	let newPeriodEnd = $state('')
+	let newTitle = $state('')
+	let newBody = $state('')
+	let generateLoading = $state(false)
 
 	async function fetchStatus() {
 		try {
-			const res = await fetch(`${PFORGE_BASE}/status`);
-			status = (await res.json()) as PForgeStatus;
+			const res = await fetch(`${PFORGE_BASE}/status`)
+			status = (await res.json()) as PForgeStatus
 		} catch {
-			status = { connected: false };
+			status = { connected: false }
 		}
 	}
 
 	async function fetchSummaries() {
-		summariesLoading = true;
+		summariesLoading = true
 		try {
-			const res = await fetch(`${PFORGE_BASE}/summaries`);
-			summaries = (await res.json()) as PForgeSummary[];
+			const res = await fetch(`${PFORGE_BASE}/summaries`)
+			summaries = (await res.json()) as PForgeSummary[]
 		} catch {
-			summaries = [];
+			summaries = []
 		}
-		summariesLoading = false;
-	}
-
-	async function initApp() {
-		if (!repo || !repo.includes('/') || !appName) return;
-		initLoading = true;
-		try {
-			const res = await fetch(`${PFORGE_BASE}/init`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ repo, name: appName })
-			});
-			const html = await res.text();
-			document.open();
-			document.write(html);
-			document.close();
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to initialize';
-			initLoading = false;
-		}
+		summariesLoading = false
 	}
 
 	async function generateSummary() {
-		if (!newPeriodStart || !newPeriodEnd || !newTitle || !newBody) return;
-		generateLoading = true;
+		if (!newPeriodStart || !newPeriodEnd || !newTitle || !newBody) return
+		generateLoading = true
 		try {
 			const res = await fetch(`${PFORGE_BASE}/summaries`, {
 				method: 'POST',
@@ -72,56 +50,56 @@
 					title: newTitle,
 					body: newBody
 				})
-			});
+			})
 			if (res.ok) {
-				newPeriodStart = '';
-				newPeriodEnd = '';
-				newTitle = '';
-				newBody = '';
-				await fetchSummaries();
+				newPeriodStart = ''
+				newPeriodEnd = ''
+				newTitle = ''
+				newBody = ''
+				await fetchSummaries()
 			}
 		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to generate summary';
+			error = err instanceof Error ? err.message : 'Failed to generate summary'
 		}
-		generateLoading = false;
+		generateLoading = false
 	}
 
 	async function saveEdit() {
-		if (!editingId) return;
+		if (!editingId) return
 		try {
 			const res = await fetch(`${PFORGE_BASE}/summaries/${editingId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ title: editTitle, body: editBody })
-			});
+			})
 			if (res.ok) {
-				editingId = null;
-				await fetchSummaries();
+				editingId = null
+				await fetchSummaries()
 			}
 		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to save';
+			error = err instanceof Error ? err.message : 'Failed to save'
 		}
 	}
 
 	function startEdit(summary: PForgeSummary) {
-		editingId = summary.id;
-		editTitle = summary.title;
-		editBody = summary.body;
+		editingId = summary.id
+		editTitle = summary.title
+		editBody = summary.body
 	}
 
 	function cancelEdit() {
-		editingId = null;
-		editTitle = '';
-		editBody = '';
+		editingId = null
+		editTitle = ''
+		editBody = ''
 	}
 
 	onMount(async () => {
-		await fetchStatus();
+		await fetchStatus()
 		if (status?.connected) {
-			await fetchSummaries();
+			await fetchSummaries()
 		}
-		loading = false;
-	});
+		loading = false
+	})
 </script>
 
 <div class="max-w-4xl mx-auto px-6 py-8">
@@ -134,49 +112,27 @@
 		</div>
 	{:else if !status?.connected}
 		<div class="bg-paper rounded-lg border border-clay-border p-8">
-			<h2 class="text-2xl font-semibold text-ink mb-2">Initialize pforge</h2>
-			<p class="text-ink-secondary mb-8">
-				Create a GitHub App to connect your repository. The app will have read/write access to
-				issues.
+			<h2 class="text-2xl font-semibold text-ink mb-2">GitHub App not configured</h2>
+			<p class="text-ink-secondary mb-6">
+				You need a GitHub App to connect your repository. Create one manually and add the
+				credentials to your <code>.env</code> file.
 			</p>
-
-			{#if error}
-				<div class="bg-red-50 border border-red-200 text-red-700 rounded-md p-4 mb-6">{error}</div>
-			{/if}
-
-			<div class="space-y-5">
-				<div>
-					<label for="pforge-repo" class="block text-sm font-medium text-ink mb-1.5"
-						>Repository</label
-					>
-					<input
-						id="pforge-repo"
-						type="text"
-						bind:value={repo}
-						placeholder="e.g. peufo/pforge"
-						class="w-full px-3.5 py-2.5 bg-white border border-clay-border rounded-md text-ink placeholder-ink-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-					/>
-				</div>
-				<div>
-					<label for="pforge-app-name" class="block text-sm font-medium text-ink mb-1.5"
-						>App name</label
-					>
-					<input
-						id="pforge-app-name"
-						type="text"
-						bind:value={appName}
-						placeholder={repo ? `pforge-${repo.split('/')[1] || repo}` : 'pforge-app'}
-						class="w-full px-3.5 py-2.5 bg-white border border-clay-border rounded-md text-ink placeholder-ink-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-					/>
-				</div>
-				<button
-					onclick={initApp}
-					disabled={!repo || !repo.includes('/') || initLoading}
-					class="w-full py-2.5 bg-primary text-white font-medium rounded-md hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+			<a
+				href="https://github.com/settings/apps/new"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center px-5 py-2.5 bg-primary text-white font-medium rounded-md hover:bg-primary-hover transition-colors"
+			>
+				Create GitHub App
+				<svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+					><path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+					/></svg
 				>
-					{initLoading ? 'Redirecting to GitHub...' : 'Create GitHub App'}
-				</button>
-			</div>
+			</a>
 		</div>
 	{:else}
 		<div class="space-y-8">

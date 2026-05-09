@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Hero from '$lib/components/landing/Hero.svelte';
-	import Demo from '$lib/components/landing/Demo.svelte';
-	import Features from '$lib/components/landing/Features.svelte';
-	import Install from '$lib/components/landing/Install.svelte';
-	import Footer from '$lib/components/landing/Footer.svelte';
+	import Hero from '$lib/components/landing/Hero.svelte'
+	import Demo from '$lib/components/landing/Demo.svelte'
+	import Features from '$lib/components/landing/Features.svelte'
+	import Install from '$lib/components/landing/Install.svelte'
+	import Footer from '$lib/components/landing/Footer.svelte'
 </script>
 
 <svelte:head>

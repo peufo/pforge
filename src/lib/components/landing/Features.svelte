@@ -20,7 +20,7 @@
 			title: 'Zero Database',
 			desc: 'Everything lives in GitHub. No Postgres, no Redis, no infrastructure to maintain.'
 		}
-	];
+	]
 </script>
 
 <section class="px-6 py-16 md:py-24">

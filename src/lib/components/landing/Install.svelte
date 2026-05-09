@@ -1,10 +1,10 @@
 <script lang="ts">
-	let copied = $state(false);
+	let copied = $state(false)
 
 	function copyCode() {
-		navigator.clipboard.writeText('bun add pforge');
-		copied = true;
-		setTimeout(() => (copied = false), 2000);
+		navigator.clipboard.writeText('bun add pforge')
+		copied = true
+		setTimeout(() => (copied = false), 2000)
 	}
 </script>
 

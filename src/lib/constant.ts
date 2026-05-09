@@ -1,1 +1,1 @@
-export const PFORGE_BASE = '/pforge';
+export const PFORGE_BASE = '/pforge'

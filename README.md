@@ -113,7 +113,7 @@ OPENAI_API_KEY=sk-...
 ```svelte
 <!-- src/routes/roadmap/+page.svelte -->
 <script>
-	import { Roadmap, RoadmapKanban, RoadmapTimeline } from 'pforge';
+	import { Roadmap, RoadmapKanban, RoadmapTimeline } from 'pforge'
 </script>
 
 <Roadmap config={{ view: 'timeline' }}>

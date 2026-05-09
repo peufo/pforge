@@ -1,24 +1,24 @@
 <script lang="ts">
-	type Status = 'shipped' | 'in-progress' | 'planned';
+	type Status = 'shipped' | 'in-progress' | 'planned'
 
 	type Item = {
-		id: number;
-		title: string;
-		desc: string;
-		status: Status;
-		upvotes: number;
-		comments: number;
-		date: string;
-	};
+		id: number
+		title: string
+		desc: string
+		status: Status
+		upvotes: number
+		comments: number
+		date: string
+	}
 
 	type StatusConfig = {
-		label: string;
-		bg: string;
-		text: string;
-		dot: string;
-	};
+		label: string
+		bg: string
+		text: string
+		dot: string
+	}
 
-	let view = $state('timeline');
+	let view = $state('timeline')
 
 	const items: Item[] = [
 		{
@@ -66,7 +66,7 @@
 			comments: 9,
 			date: 'Q3 2025'
 		}
-	];
+	]
 
 	const statusConfig: Record<Status, StatusConfig> = {
 		shipped: { label: 'Shipped', bg: 'bg-primary-subtle', text: 'text-primary', dot: 'bg-primary' },
@@ -77,12 +77,12 @@
 			dot: 'bg-amber-600'
 		},
 		planned: { label: 'Planned', bg: 'bg-gray-100', text: 'text-gray-600', dot: 'bg-gray-400' }
-	};
+	}
 
 	function groupedByStatus(): Record<Status, Item[]> {
-		const groups: Record<Status, Item[]> = { planned: [], 'in-progress': [], shipped: [] };
-		for (const item of items) groups[item.status].push(item);
-		return groups;
+		const groups: Record<Status, Item[]> = { planned: [], 'in-progress': [], shipped: [] }
+		for (const item of items) groups[item.status].push(item)
+		return groups
 	}
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	function scrollToDemo() {
-		document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+		document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })
 	}
 </script>
 

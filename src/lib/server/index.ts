@@ -1,1 +1,1 @@
-export { pforgeAdminHandler } from './pforge/handler.js';
+export { pforgeHandler } from './handler.js'
