@@ -1,1 +1,1 @@
-export { pforgeHandler } from './handler'
+export { pforgeServerApi } from './api'
