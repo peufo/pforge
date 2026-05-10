@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths'
+
 	let copied = $state(false)
 
 	function copyCode() {
@@ -11,7 +13,7 @@
 <section class="px-6 py-16 md:py-24 bg-paper-deep">
 	<div class="max-w-2xl mx-auto text-center">
 		<h2 class="text-2xl md:text-3xl font-semibold text-ink mb-4">Get started in seconds</h2>
-		<p class="text-ink-secondary mb-10">One command. A config file. Your roadmap is live.</p>
+		<p class="text-ink-secondary mb-10">A config file. Your roadmap is live.</p>
 
 		<div class="bg-ink rounded-lg p-5 text-left overflow-hidden">
 			<div class="flex items-center justify-between mb-3">
@@ -52,9 +54,7 @@
 		</div>
 
 		<a
-			href="https://github.com/your-org/pforge"
-			target="_blank"
-			rel="noopener noreferrer"
+			href={resolve('/docs/getting-started')}
 			class="inline-flex items-center gap-2 mt-8 text-sm font-medium text-primary hover:text-primary-hover transition-colors"
 		>
 			Read the full documentation

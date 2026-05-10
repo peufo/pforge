@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths'
+
 	function scrollToDemo() {
 		document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })
 	}
@@ -51,7 +53,7 @@
 		</h1>
 
 		<p class="text-lg md:text-xl text-ink-secondary max-w-xl mx-auto mb-10 leading-relaxed">
-			Zero database. One command. Your users finally understand what's shipping.
+			Zero database. An interactive roadmap your non-technical users finally understand.
 		</p>
 
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -77,9 +79,7 @@
 			</button>
 
 			<a
-				href="https://github.com/your-org/pforge"
-				target="_blank"
-				rel="noopener noreferrer"
+				href={resolve('/docs/getting-started')}
 				class="inline-flex items-center justify-center px-7 py-3.5 bg-clay text-ink font-medium rounded-md hover:bg-clay-border transition-colors duration-200"
 			>
 				Read the docs

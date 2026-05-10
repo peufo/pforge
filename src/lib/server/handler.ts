@@ -21,7 +21,8 @@ const handlers = {
 	}
 } satisfies Handlers
 
-async function handleGetIssues(event: RequestEvent): Promise<Response> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function handleGetIssues(_event: RequestEvent): Promise<Response> {
 	const issues = await getGithubIssues()
 	return json(issues)
 }

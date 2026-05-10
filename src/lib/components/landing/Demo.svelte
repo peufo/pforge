@@ -223,8 +223,10 @@
 		</div>
 
 		<p class="text-center text-sm text-ink-muted mt-6">
-			This roadmap is powered by <span class="font-medium text-ink-secondary">pforge</span> — try upvoting
-			or switching views above.
+			This interactive roadmap is powered by <span class="font-medium text-ink-secondary"
+				>pforge</span
+			>
+			— your non-technical users can upvote, comment, and switch views without ever touching GitHub.
 		</p>
 	</div>
 </section>
