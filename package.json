@@ -72,6 +72,7 @@
 	"type": "module",
 	"types": "./dist/index.d.ts",
 	"dependencies": {
+		"dotenv": "^17.4.2",
 		"octokit": "^5.0.5"
 	}
 }
