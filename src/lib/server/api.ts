@@ -2,7 +2,7 @@ import { PFORGE_BASE } from '$lib/constant'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { getGithubIssues } from './github/issues'
 
-type Endpoint = (event: RequestEvent) => Promise<unknown>
+type EndpointHandler<T> = (event: RequestEvent) => Promise<T>
 
 export async function pforgeServerApi(event: RequestEvent): Promise<Response | null> {
 	const pathname = event.url.pathname
@@ -15,11 +15,12 @@ export async function pforgeServerApi(event: RequestEvent): Promise<Response | n
 	return json(res)
 }
 
-type APIShape = Record<string, Partial<Record<string, Endpoint>>>
-export type PForgeServerAPI = typeof api
+type APIShape = Record<string, Partial<Record<string, EndpointHandler<unknown>>>>
 
 const api = {
 	'/issues': {
 		get: getGithubIssues
 	}
 } satisfies APIShape
+
+export type PForgeServerAPI = typeof api

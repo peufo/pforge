@@ -1,6 +1,17 @@
-type GithubIssue = Record<string, unknown>
+import type { GithubIssue } from '$lib/types'
+import { getGithubEnv } from './env'
+import { getInstallationOctokit } from './octokit'
 
-// TODO: get gihub Issues
 export async function getGithubIssues(): Promise<GithubIssue[]> {
-	return []
+	const { owner, repo } = getGithubEnv()
+	const octokit = await getInstallationOctokit()
+
+	const { data: issues } = await octokit.rest.issues.listForRepo({
+		owner,
+		repo,
+		state: 'all',
+		per_page: 100
+	})
+
+	return issues as GithubIssue[]
 }
