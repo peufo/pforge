@@ -10,3 +10,7 @@ export type GithubIssue = {
 	labels: Array<{ name: string; color: string }>
 	user: { login: string; avatar_url: string } | null
 }
+
+export type GetIssuesParams = {
+	state?: 'open' | 'closed' | 'all'
+}

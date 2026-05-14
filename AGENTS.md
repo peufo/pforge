@@ -8,7 +8,7 @@
 
 **pforge** is a Svelte 5 component library (with a SvelteKit landing site) for building a **public roadmap page** from GitHub data — without a database.
 
-The project is currently in early development. The landing page (`src/routes/+page.svelte`) is a static marketing/demo site with hardcoded sample data. The library entry point (`src/lib/index.ts`) is empty. No GitHub integration, server code, or library components exist yet.
+The project is currently in early development. The landing page (`src/routes/+page.svelte`) is a static marketing/demo site with hardcoded sample data. A GitHub integration layer, server API router, and first library component (`GithubIssues`) exist. The patterns for adding new endpoints and hybrid components are now stabilised.
 
 - **Repository language**: English (code, comments), French (product docs / README narrative)
 - **License**: MIT
@@ -85,17 +85,34 @@ src/
   app.html              # HTML shell (loads Inter font from Google Fonts)
   app.css               # Global styles: Tailwind v4 import + custom @theme tokens
   app.d.ts              # Empty SvelteKit ambient type declarations
+  hooks.server.ts       # Global hook that forwards /pforge/* to pforgeServerApi
   routes/
     +layout.svelte      # Root layout: imports app.css, renders children
     +page.svelte        # Landing page: Hero → Demo → Features → Install → Footer
+    roadmap/
+      +page.svelte      # Roadmap page rendering GithubIssues (SSR + client hydration)
+      +page.server.ts   # SSR loader for roadmap data
   lib/
-    index.ts            # Library entry point (currently empty)
-    components/landing/ # Landing-page-only components
-      Hero.svelte
-      Demo.svelte
-      Features.svelte
-      Install.svelte
-      Footer.svelte
+    index.ts            # Library entry point — exports components, pforgeApi, useHybridData
+    api.ts              # Typed client API — one getter per endpoint
+    hybrid-data.ts      # Reusable helper for hybrid components (prop vs fetch)
+    types.ts            # Shared types (GithubIssue, GetIssuesParams, etc.)
+    constant.ts         # PFORGE_BASE and other constants
+    components/
+      GithubIssues.svelte      # First library component (hybrid)
+      landing/                 # Landing-page-only components
+        Hero.svelte
+        Demo.svelte
+        Features.svelte
+        Install.svelte
+        Footer.svelte
+    server/
+      api.ts            # Server router + PForgeServerAPI type contract
+      index.ts          # Server-side public exports
+      github/           # GitHub-specific business logic
+        issues.ts       # getGithubIssues(params)
+        octokit.ts      # Octokit installation helper
+        env.ts          # GitHub env validation
     vitest-examples/    # Boilerplate tests left from project scaffolding
       greet.ts
       greet.spec.ts
@@ -112,6 +129,8 @@ static/
 - `src/routes/` is the SvelteKit app (landing site). It is NOT packaged into the library.
 - Landing components live under `src/lib/components/landing/` even though they are app-specific.
 - Server-side code should go in `src/lib/server/` (excluded from browser tests by Vitest config).
+- Business logic that calls external APIs (GitHub, etc.) lives in `src/lib/server/<source>/`.
+- The API contract between client and server is defined by `PForgeServerAPI` in `src/lib/server/api.ts`.
 
 ---
 
@@ -244,19 +263,123 @@ The library is configured as a Svelte package:
 ## Security Considerations
 
 - No secrets are committed. `.gitignore` excludes `.env`, `.env.*` (except `.env.example` and `.env.test`).
-- The app is currently static with no server endpoints (`+page.svelte` only, no `+page.server.ts` or API routes).
-- Any future GitHub App integration must store credentials in environment variables, not in code.
+- Server endpoints are handled by `pforgeServerApi` in `hooks.server.ts` for all `/pforge/*` routes.
+- GitHub App credentials are stored in environment variables (`GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, etc.).
+
+---
+
+## Library Architecture
+
+This section documents the standard pattern for adding new GitHub-backed components. Follow it for every new resource (milestones, pull requests, releases, etc.).
+
+### 1. Types
+
+Add the domain type and its query params to `src/lib/types.ts`:
+
+```ts
+export type GithubMilestone = {
+	/* ... */
+}
+export type GetMilestonesParams = { state?: 'open' | 'closed' | 'all' }
+```
+
+### 2. Server Handler
+
+Create a pure business-logic file in `src/lib/server/<source>/`:
+
+```ts
+// src/lib/server/github/milestones.ts
+import type { GithubMilestone, GetMilestonesParams } from '$lib/types'
+
+export async function getGithubMilestones(
+	params?: GetMilestonesParams
+): Promise<GithubMilestone[]> {
+	// Octokit calls, data mapping, etc.
+}
+```
+
+Handlers must **not** contain HTTP logic (status codes, headers). They receive typed params and return typed data.
+
+### 3. API Router
+
+Register the endpoint in `src/lib/server/api.ts`:
+
+```ts
+const api = {
+	'/issues': {
+		get: async (params: GetIssuesParams, _event: RequestEvent) => getGithubIssues(params)
+	},
+	'/milestones': {
+		get: async (params: GetMilestonesParams, _event: RequestEvent) => getGithubMilestones(params)
+	}
+} satisfies Record<string, EndpointConfig>
+```
+
+`PForgeServerAPI` is automatically derived from `typeof api`, stripping `RequestEvent` from the public contract. The router (`pforgeServerApi`) parses `searchParams`, casts them to the handler's param type, and returns `json(res)`.
+
+### 4. API Client
+
+Expose a typed getter in `src/lib/api.ts`:
+
+```ts
+export const pforgeApi: ApiClient = {
+	'/issues': useApiGetter('/issues'),
+	'/milestones': useApiGetter('/milestones')
+}
+```
+
+`useApiGetter` serialises optional params into query strings. The return type is inferred from `PForgeServerAPI`.
+
+### 5. Hybrid Component
+
+Create a component that accepts data via **props** (SSR / parent-provided) **or** fetches it client-side:
+
+```ts
+// src/lib/components/GithubMilestones.svelte
+<script lang="ts">
+  import type { GithubMilestone, GetMilestonesParams } from '$lib/types'
+  import { pforgeApi } from '$lib/api'
+  import { useHybridData } from '$lib/hybrid-data'
+
+  type Props = {
+    milestones?: GithubMilestone[]
+    state?: GetMilestonesParams['state']
+  }
+
+  let { milestones, state }: Props = $props()
+
+  const { data, loading, error, reload } = useHybridData(
+    () => milestones,
+    () => pforgeApi['/milestones']({ state })
+  )
+</script>
+```
+
+`useHybridData` encapsulates the "prop vs fetch" logic, loading states, error handling, and retry.
+
+### 6. Exports
+
+- Add the component to `src/lib/index.ts` (library boundary).
+- If the server handler is useful for consumers, export it from `src/lib/server/index.ts`.
+
+### Summary — Convention Checklist
+
+| Step           | File                           | What to do                            |
+| -------------- | ------------------------------ | ------------------------------------- |
+| Types          | `src/lib/types.ts`             | Add resource type + params type       |
+| Handler        | `src/lib/server/<source>/*.ts` | Pure function: params → Promise<data> |
+| Router         | `src/lib/server/api.ts`        | Register in `api` object              |
+| Client         | `src/lib/api.ts`               | Register in `pforgeApi` object        |
+| Component      | `src/lib/components/*.svelte`  | Use `useHybridData`                   |
+| Library export | `src/lib/index.ts`             | Re-export component + helpers         |
 
 ---
 
 ## Current State & Known Gaps
 
-1. **Library entry point is empty** — `src/lib/index.ts` needs exports once components are ready.
-2. **No actual library components exist yet** — the components in `src/lib/components/landing/` are landing-page-only.
-3. **No server code** — `src/lib/server/` does not exist yet.
-4. **No GitHub API integration** — the Demo section uses hardcoded sample data.
-5. **No CLI tooling** — the README mentions `npx pforge generate-summaries`, which does not exist yet.
-6. **Tests are only examples** — the `vitest-examples/` folder is scaffolding; real tests should be added alongside features.
+1. **Tests are only examples** — the `vitest-examples/` folder is scaffolding; real tests should be added alongside features.
+2. **No CLI tooling** — the README mentions `npx pforge generate-summaries`, which does not exist yet.
+3. **Limited GitHub resources** — only `issues` is implemented; milestones, pull requests, releases, etc. are pending.
 
 ---
 

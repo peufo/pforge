@@ -1,38 +1,24 @@
 <script lang="ts">
-	import type { GithubIssue } from '$lib/types'
+	import type { GithubIssue, GetIssuesParams } from '$lib/types'
 	import { pforgeApi } from '$lib/api'
+	import { useHybridData } from '$lib/hybrid-data'
 
 	type Props = {
 		issues?: GithubIssue[]
+		state?: GetIssuesParams['state']
 	}
 
-	let { issues }: Props = $props()
+	let { issues, state }: Props = $props()
 
-	let issuesState = $state<GithubIssue[] | undefined>(undefined)
-	let loading = $state(true)
-	let error = $state<string | null>(null)
-
-	async function loadIssues() {
-		loading = true
-		error = null
-		try {
-			issuesState = await pforgeApi['/issues']()
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Failed to load issues'
-		} finally {
-			loading = false
-		}
-	}
-
-	$effect(() => {
-		if (issues) {
-			issuesState = issues
-			loading = false
-			error = null
-		} else {
-			loadIssues()
-		}
-	})
+	const {
+		data: issuesState,
+		loading,
+		error,
+		reload
+	} = useHybridData<GithubIssue[]>(
+		() => issues,
+		() => pforgeApi['/issues']({ state })
+	)
 
 	function statusFromIssue(issue: GithubIssue): 'open' | 'closed' {
 		return issue.state
@@ -50,7 +36,7 @@
 	<div class="py-12 text-center">
 		<p class="text-sm text-red-600">{error}</p>
 		<button
-			onclick={loadIssues}
+			onclick={reload}
 			class="mt-3 text-sm font-medium text-primary hover:text-primary-hover transition-colors cursor-pointer"
 		>
 			Try again
