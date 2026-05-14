@@ -1,12 +1,17 @@
 import { PFORGE_BASE } from '$lib/constant'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { getGithubIssues } from './github/issues'
-import type { GetIssuesParams, GithubIssue } from '$lib/types'
+import { getRepoStats } from './github/stats'
+import type { GetIssuesParams, GithubIssue, RepoStats } from '$lib/types'
 
 export type PForgeServerAPI = {
 	'/issues': {
 		params: GetIssuesParams
 		response: GithubIssue[]
+	}
+	'/stats': {
+		params: void
+		response: RepoStats
 	}
 }
 
@@ -24,6 +29,11 @@ const api: ServerImpl = {
 		get: async (params) => {
 			return getGithubIssues(params)
 		}
+	},
+	'/stats': {
+		get: async () => {
+			return getRepoStats()
+		}
 	}
 }
 
@@ -36,6 +46,6 @@ export async function pforgeServerApi(event: RequestEvent): Promise<Response | n
 	if (!endpoint) return null
 
 	const rawParams = Object.fromEntries(event.url.searchParams)
-	const res = await endpoint(rawParams as PForgeServerAPI[keyof PForgeServerAPI]['params'], event)
+	const res = await (endpoint as (...args: unknown[]) => Promise<unknown>)(rawParams, event)
 	return json(res)
 }

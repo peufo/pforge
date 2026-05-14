@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { GithubIssue, GetIssuesParams } from '$lib/types'
 	import { pforgeApi } from '$lib/api'
-	import { useHybridData } from '$lib/hybrid-data'
+	import { useHybridData } from '$lib/hybrid-data.svelte'
 
 	type Props = {
 		issues?: GithubIssue[]

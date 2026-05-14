@@ -29,5 +29,6 @@ function useApiGetter<E extends EndpointPath>(route: E): ApiClient[E] {
 }
 
 export const pforgeApi: ApiClient = {
-	'/issues': useApiGetter('/issues')
+	'/issues': useApiGetter('/issues'),
+	'/stats': useApiGetter('/stats')
 }

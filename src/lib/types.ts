@@ -14,3 +14,8 @@ export type GithubIssue = {
 export type GetIssuesParams = {
 	state?: 'open' | 'closed' | 'all'
 }
+
+export type RepoStats = {
+	closedIssues: number
+	commits: number
+}
